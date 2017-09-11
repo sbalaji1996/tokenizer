@@ -1,0 +1,6 @@
+[package]
+name = "tokenizer"
+version = "0.1.0"
+authors = ["Srinand Balaji <srinand.balaji@gmail.com>"]
+
+[dependencies]
