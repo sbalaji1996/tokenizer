@@ -31,7 +31,6 @@ fn main() {
     file.read_to_string(&mut contents)
         .expect("something went wrong reading the file");
 
-    //println!("{}", contents);
     tokenize(contents);
 }
 
@@ -47,14 +46,12 @@ fn tokenize(contents: String) -> Result<(), Error>{
 
     let tokens = test_str_slice.split(separators);
 
-    let mut tks = Tokens::default(); //HashMap::new();
+    let mut tks = Tokens::default();
 
     for token in tokens {
         let count = tks.map.entry(token.to_owned()).or_insert(0);
         *count += 1;
     }
-
-    //println!("{:?}", tks.map);
 
     let j = serde_json::to_string(&tks)?;
 
