@@ -1,14 +1,38 @@
+extern crate clap;
 extern crate serde;
 extern crate serde_json;
 
 #[macro_use]
 extern crate serde_derive;
 
+use clap::{Arg,App};
 use serde_json::Error;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::BufReader;
+use std::io::prelude::*;
 
 fn main() {
-    tokenize();
+    let matches = App::new("tokenizer")
+        .version("0.1.0")
+        .author("Srinand Balaji <srinand@berkeley.edu>")
+        .about("basic tokenizer written in rust.")
+        .arg(Arg::with_name("file")
+             .required(true)
+             .takes_value(true)
+             .index(1)
+             .help("text file to tokenize"))
+        .get_matches();
+    let file = matches.value_of("file").unwrap();
+    println!("{}", file);
+    
+    let mut file = File::open(file).expect("file not found");
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)
+        .expect("something went wrong reading the file");
+
+    //println!("{}", contents);
+    tokenize(contents);
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -16,11 +40,9 @@ struct Tokens {
     map: HashMap<String, i32>
 }
 
-fn tokenize() -> Result<(), Error>{
+fn tokenize(contents: String) -> Result<(), Error>{
 
-    let test_str : String = "Through his portrayal in Plato's dialogues, Socrates has become renowned for his contribution to the field of ethics, and it is this Platonic Socrates who lends his name to the concepts of Socratic irony and the Socratic method, or elenchus. The latter remains a commonly used tool in a wide range of discussions, and is a type of pedagogy in which a series of questions is asked not only to draw individual answers, but also to encourage fundamental insight into the issue at hand. Plato's Socrates also made important and lasting contributions to the field of epistemology, and his ideologies and approach have proven a strong foundation for much Western philosophy that has followed.".to_string();
-
-    let test_str_slice = test_str.as_str();
+    let test_str_slice = contents.as_str();
     let separators : &[char] = &[' ', '.', '?', '!', ',', ';', ':', '(', ')', '[', ']'];
 
     let tokens = test_str_slice.split(separators);
@@ -32,7 +54,7 @@ fn tokenize() -> Result<(), Error>{
         *count += 1;
     }
 
-    println!("{:?}", tks.map);
+    //println!("{:?}", tks.map);
 
     let j = serde_json::to_string(&tks)?;
 
